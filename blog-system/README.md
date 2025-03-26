@@ -27,7 +27,7 @@ Blog Management is a comprehensive web application designed to simplify the crea
 ## Tech Stack
 - **Frontend**: HTML, CSS, JavaScript (React.js framework)
 - **Backend**: Node.js with Express
-- **Database**: MongoDB
+- **Database**: MySQL
 - **Authentication**: JWT (JSON Web Tokens)
 - **Media Storage**: AWS S3 (or similar cloud storage)
 - **Deployment**: Docker containerization
