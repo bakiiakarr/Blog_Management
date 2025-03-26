@@ -8,23 +8,10 @@ use Illuminate\Support\Facades\Log;
 
 class DeleteUncommentedPosts extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'posts:delete-uncommented';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Delete posts that have not received any comments in the last week';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $posts = Post::whereDoesntHave('comments', function ($query) {

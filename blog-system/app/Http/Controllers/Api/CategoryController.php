@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -19,37 +18,42 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $category = new Category();
+        $category->name = $validated['name'];
+        $category->slug = Str::slug($validated['name']);
+        $category->description = $validated['description'] ?? null;
+        $category->save();
 
-        $category = Category::create($validated);
         return response()->json($category, 201);
     }
 
     public function show(Category $category)
     {
-        return response()->json($category);
+        return response()->json($category->load('posts'));
     }
 
     public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $category->name = $validated['name'];
+        $category->slug = Str::slug($validated['name']);
+        $category->description = $validated['description'] ?? null;
+        $category->save();
 
-        $category->update($validated);
         return response()->json($category);
     }
 
     public function destroy(Category $category)
     {
         $category->delete();
-        return response()->json(['message' => 'Kategori başarıyla silindi']);
+        return response()->json(null, 204);
     }
 }

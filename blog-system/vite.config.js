@@ -20,6 +20,12 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': '/resources/js',
+            '~': '/resources/js',
+        },
+    },
+    server: {
+        hmr: {
+            host: 'localhost',
         },
     },
 });

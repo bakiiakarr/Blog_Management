@@ -6,13 +6,34 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with(['user', 'categories'])->get();
-        return response()->json($posts);
+        $posts = Post::with(['user', 'categories'])->latest()->get();
+        return response()->json([
+            'status' => 'success',
+            'data' => $posts->map(function ($post) {
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'excerpt' => Str::limit(strip_tags($post->content), 150),
+                    'created_at' => $post->created_at->format('Y-m-d H:i:s'),
+                    'user' => $post->user ? [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name
+                    ] : null,
+                    'categories' => $post->categories->map(function ($category) {
+                        return [
+                            'id' => $category->id,
+                            'name' => $category->name
+                        ];
+                    })
+                ];
+            })
+        ]);
     }
 
     public function store(Request $request)
@@ -27,8 +48,9 @@ class PostController extends Controller
 
         $post = new Post();
         $post->title = $validated['title'];
+        $post->slug = Str::slug($validated['title']);
         $post->content = $validated['content'];
-        $post->user_id = auth()->id();
+        $post->user_id = 1; // Geçici olarak sabit bir kullanıcı ID'si
 
         if ($request->hasFile('cover')) {
             $path = $request->file('cover')->store('posts', 'public');
@@ -57,6 +79,7 @@ class PostController extends Controller
         ]);
 
         $post->title = $validated['title'];
+        $post->slug = Str::slug($validated['title']);
         $post->content = $validated['content'];
 
         if ($request->hasFile('cover')) {
